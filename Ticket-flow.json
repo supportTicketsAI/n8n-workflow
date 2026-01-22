@@ -1,0 +1,33 @@
+{
+  "name": "Ticket-flow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "5ec1e629-d6db-4290-a81d-61a71b3b7883",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -80,
+        -16
+      ],
+      "id": "6c9fead2-6ac3-418b-9fe8-b6da1a5e9a3e",
+      "name": "Webhook",
+      "webhookId": "5ec1e629-d6db-4290-a81d-61a71b3b7883"
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "efb90904-2266-4ee7-83b8-51e37ad591a1",
+  "meta": {
+    "instanceId": "9d961b1c216757284a81efc31ce8a1b8ef4550e9a68b24ef839bb7bc677bc223"
+  },
+  "id": "4phlQ2DIketIh13QKP_2D",
+  "tags": []
+}
