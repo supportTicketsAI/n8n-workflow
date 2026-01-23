@@ -1,5 +1,5 @@
 {
-  "name": "Ticket-flow",
+  "name": "AI-Powered Support Co-Pilot - VIVETORI",
   "nodes": [
     {
       "parameters": {
@@ -9,16 +9,262 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -80,
-        -16
+        180,
+        300
       ],
       "id": "6c9fead2-6ac3-418b-9fe8-b6da1a5e9a3e",
-      "name": "Webhook",
+      "name": "🎯 Webhook - Ticket Procesado",
       "webhookId": "5ec1e629-d6db-4290-a81d-61a71b3b7883"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "8a08b6cd-bd23-4a25-a1f5-8b7b7d72c144",
+              "leftValue": "={{ $json.sentiment }}",
+              "rightValue": "Negativo",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        500,
+        300
+      ],
+      "id": "7d4a8b2e-3c5f-4e21-9b12-8f6e7a9c2d1b",
+      "name": "🤔 ¿Sentimiento Negativo?"
+    },
+    {
+      "parameters": {
+        "to": "support@vivetori.com",
+        "subject": "🚨 ALERTA: Ticket con Sentimiento Negativo - {{ $('🎯 Webhook - Ticket Procesado').item.json.ticket_id }}",
+        "message": "=🚨 **ALERTA DE SOPORTE URGENTE**\n\n📋 **Ticket ID:** {{ $('🎯 Webhook - Ticket Procesado').item.json.ticket_id }}\n📂 **Categoría:** {{ $('🎯 Webhook - Ticket Procesado').item.json.category }}\n😠 **Sentimiento:** {{ $('🎯 Webhook - Ticket Procesado').item.json.sentiment }}\n🎯 **Confianza IA:** {{ $('🎯 Webhook - Ticket Procesado').item.json.confidence }}%\n⏱️ **Tiempo de Procesamiento:** {{ $('🎯 Webhook - Ticket Procesado').item.json.processing_time }}\n\n📝 **Descripción del Ticket:**\n{{ $('🎯 Webhook - Ticket Procesado').item.json.description }}\n\n🔗 **Acción Requerida:**\nEste ticket requiere atención inmediata debido al sentimiento negativo detectado por nuestro sistema de IA.\n\n---\n🤖 Generado automáticamente por AI-Powered Support Co-Pilot\n💻 Dashboard: http://localhost:5173/dashboard",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        820,
+        180
+      ],
+      "id": "9a1b2c3d-4e5f-6789-abcd-ef1234567890",
+      "name": "📧 Enviar Email de Alerta"
+    },
+    {
+      "parameters": {
+        "url": "https://hooks.slack.com/workflows/REPLACE-WITH-YOUR-SLACK-WEBHOOK",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"🚨 Ticket con Sentimiento Negativo Detectado\",\n  \"blocks\": [\n    {\n      \"type\": \"header\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"🚨 ALERTA: Ticket Negativo\"\n      }\n    },\n    {\n      \"type\": \"section\",\n      \"fields\": [\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*Ticket ID:*\\n{{ $('🎯 Webhook - Ticket Procesado').item.json.ticket_id }}\"\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*Categoría:*\\n{{ $('🎯 Webhook - Ticket Procesado').item.json.category }}\"\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*Sentimiento:*\\n😠 {{ $('🎯 Webhook - Ticket Procesado').item.json.sentiment }}\"\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*Confianza IA:*\\n{{ $('🎯 Webhook - Ticket Procesado').item.json.confidence }}%\"\n        }\n      ]\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Descripción:*\\n{{ $('🎯 Webhook - Ticket Procesado').item.json.description }}\"\n      }\n    },\n    {\n      \"type\": \"actions\",\n      \"elements\": [\n        {\n          \"type\": \"button\",\n          \"text\": {\n            \"type\": \"plain_text\",\n            \"text\": \"Ver Dashboard\"\n          },\n          \"url\": \"http://localhost:5173/dashboard\",\n          \"action_id\": \"view_dashboard\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        820,
+        300
+      ],
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567891",
+      "name": "💬 Notificar Slack (Opcional)"
+    },
+    {
+      "parameters": {
+        "url": "https://api.telegram.org/botYOUR_BOT_TOKEN/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": \"YOUR_CHAT_ID\",\n  \"text\": \"🚨 *ALERTA DE SOPORTE VIVETORI*\\n\\n📋 *Ticket:* {{ $('🎯 Webhook - Ticket Procesado').item.json.ticket_id }}\\n📂 *Categoría:* {{ $('🎯 Webhook - Ticket Procesado').item.json.category }}\\n😠 *Sentimiento:* {{ $('🎯 Webhook - Ticket Procesado').item.json.sentiment }}\\n🎯 *Confianza:* {{ $('🎯 Webhook - Ticket Procesado').item.json.confidence }}%\\n\\n📝 *Descripción:*\\n{{ $('🎯 Webhook - Ticket Procesado').item.json.description }}\\n\\n🔗 [Ver Dashboard](http://localhost:5173/dashboard)\",\n  \"parse_mode\": \"Markdown\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        820,
+        420
+      ],
+      "id": "b2c3d4e5-f6g7-h890-ijkl-mn1234567892",
+      "name": "📱 Notificar Telegram (Opcional)"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "ticket_logs",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ticket_id": "={{ $('🎯 Webhook - Ticket Procesado').item.json.ticket_id }}",
+            "action": "notification_sent",
+            "details": "=Notificación enviada por sentimiento negativo. Categoría: {{ $('🎯 Webhook - Ticket Procesado').item.json.category }}, Confianza: {{ $('🎯 Webhook - Ticket Procesado').item.json.confidence }}%",
+            "created_at": "={{ new Date().toISOString() }}",
+            "processing_time": "={{ $('🎯 Webhook - Ticket Procesado').item.json.processing_time }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        300
+      ],
+      "id": "c3d4e5f6-g7h8-i901-jklm-no1234567893",
+      "name": "📊 Log en Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YOUR_SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "neutral_or_positive"
+            },
+            {
+              "name": "action",
+              "value": "no_notification_needed"
+            },
+            {
+              "name": "message",
+              "value": "=Ticket procesado exitosamente. Categoría: {{ $('🎯 Webhook - Ticket Procesado').item.json.category }}, Sentimiento: {{ $('🎯 Webhook - Ticket Procesado').item.json.sentiment }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        820,
+        540
+      ],
+      "id": "d4e5f6g7-h8i9-j012-klmn-op1234567894",
+      "name": "✅ Ticket OK - Sin Alerta"
+    },
+    {
+      "parameters": {
+        "message": "=🎉 **TICKET PROCESADO EXITOSAMENTE**\\n\\n📋 **ID:** {{ $('🎯 Webhook - Ticket Procesado').item.json.ticket_id }}\\n📂 **Categoría:** {{ $('🎯 Webhook - Ticket Procesado').item.json.category }}\\n😊 **Sentimiento:** {{ $('🎯 Webhook - Ticket Procesado').item.json.sentiment }}\\n🎯 **Confianza:** {{ $('🎯 Webhook - Ticket Procesado').item.json.confidence }}%\\n⏱️ **Tiempo:** {{ $('🎯 Webhook - Ticket Procesado').item.json.processing_time }}\\n\\n📝 **Descripción:** {{ $('🎯 Webhook - Ticket Procesado').item.json.description }}\\n\\n✅ **Estado:** Procesado automáticamente, no requiere acción inmediata.\\n\\n---\\n🤖 AI-Powered Support Co-Pilot - VIVETORI"
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        540
+      ],
+      "id": "e5f6g7h8-i9j0-k123-lmno-pq1234567895",
+      "name": "🎮 Log Discord (Opcional)",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "YOUR_DISCORD_WEBHOOK_ID",
+          "name": "Discord Webhook"
+        }
+      }
     }
   ],
   "pinData": {},
-  "connections": {},
+  "connections": {
+    "🎯 Webhook - Ticket Procesado": {
+      "main": [
+        [
+          {
+            "node": "🤔 ¿Sentimiento Negativo?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤔 ¿Sentimiento Negativo?": {
+      "main": [
+        [
+          {
+            "node": "📧 Enviar Email de Alerta",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "💬 Notificar Slack (Opcional)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📱 Notificar Telegram (Opcional)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "✅ Ticket OK - Sin Alerta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📧 Enviar Email de Alerta": {
+      "main": [
+        [
+          {
+            "node": "📊 Log en Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💬 Notificar Slack (Opcional)": {
+      "main": [
+        [
+          {
+            "node": "📊 Log en Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📱 Notificar Telegram (Opcional)": {
+      "main": [
+        [
+          {
+            "node": "📊 Log en Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "✅ Ticket OK - Sin Alerta": {
+      "main": [
+        [
+          {
+            "node": "🎮 Log Discord (Opcional)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
   "active": true,
   "settings": {
     "executionOrder": "v1",
@@ -29,5 +275,12 @@
     "instanceId": "9d961b1c216757284a81efc31ce8a1b8ef4550e9a68b24ef839bb7bc677bc223"
   },
   "id": "4phlQ2DIketIh13QKP_2D",
-  "tags": []
+  "tags": [
+    {
+      "createdAt": "2026-01-22T23:45:00.000Z",
+      "updatedAt": "2026-01-22T23:45:00.000Z",
+      "id": "vivetori-ai-support",
+      "name": "VIVETORI AI Support"
+    }
+  ]
 }
